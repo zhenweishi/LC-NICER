@@ -1,0 +1,5 @@
+ID,PID,Label,phase,image_path,mask_path
+demo_pre_P1,P1,0,pre,image/DT60508.nii.gz,mask/DT60508.nii.gz
+demo_post_P1,P1,0,post,image/T5179839.nii.gz,mask/T5179839.nii.gz
+demo_pre_P2,P2,1,pre,image/DT89646.nii.gz,mask/DT89646.nii.gz
+demo_post_P2,P2,1,post,image/DT192542.nii.gz,mask/DT192542.nii.gz

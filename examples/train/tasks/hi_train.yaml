@@ -1,0 +1,87 @@
+Task_Name: "hi_train"
+
+Datasets:
+  lung:
+    type: training
+    path: data/train/data.csv
+
+Preprocessing:
+  use_multiprocessing: true
+  Pipeline: 
+    - resample
+
+VariousMask:
+  use_multiprocessing: true
+  # Copy the original images to the output directory
+  # otherwise, the symlink will be created, this may cause the error
+  CopyImages: true 
+  KernelSizes: 
+    - 3
+    - 5
+    - 7
+  MaskTypes:
+    - tumor
+    - peritumor
+
+PreSegmentation:
+  use_multiprocessing: true
+  max_workers: null
+  CopyImages: true
+  SVMaxParts: 100
+  EachSVMinPixels: 343 # 7 * 7 * 7
+
+FeatureExtraction#SV:
+  use_multiprocessing: false
+  parallel_type: "process" # thread or process
+  params: ../../configs/feature_extraction/CT_tumor_he.yaml
+  skip_errors: true
+
+DeepLearningFeatureExtraction#SV:
+  mae3d_lung_CT:
+    root: ../../configs/dl_feature_extraction/mae3d_lung_CT
+
+Compose#SV-DL-PCA16:
+  Normalization: 
+    method: StandardScaler
+    reference: null
+
+  Decomposition: # https://scikit-learn.org/stable/api/sklearn.decomposition.html
+    method: PCA
+    kwargs:
+      n_components: 16
+    # if reference is null, `fit_transform` will be used on each dataset
+    # otherwise, `fit` on the reference and `transform` on each dataset
+    reference: null 
+
+Normalization#01: 
+  method: MinMaxScaler
+  reference: null
+
+SubRegionClustering:
+  use_multiprocessing: true
+  CopyImages: true
+  src_dir: "PreSegmentation"
+  class_name: sklearn.mixture.GaussianMixture
+  kwargs:
+    n_components: 5
+    random_state: 66
+    covariance_type: "full"
+    max_iter: 1000
+
+DeepLearningFeatureExtraction#SR:
+  mae3d_lung_CT:
+    root: ../../configs/dl_feature_extraction/mae3d_lung_CT
+
+FeatureExtraction#SR:
+  use_multiprocessing: true
+  parallel_type: "process" # thread or process
+  params: ../../configs/feature_extraction/CT_tumor_he.yaml
+  skip_errors: true
+
+
+TumorHeterogeneity:
+  Normalization:
+    method: StandardScaler
+  Decomposition:
+    method: PCA
+    kwargs: null # `n_components` will be set to 1 forever

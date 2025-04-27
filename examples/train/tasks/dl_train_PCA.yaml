@@ -1,0 +1,16 @@
+Task_Name: "dl_train_PCA"
+
+Datasets:
+  lung:
+    type: training
+    path: data/train/data.csv
+
+Cropper:
+  method: all_roi_resize
+  largest_connected_component: false
+  size: 48
+  use_multiprocessing: true
+
+DeepLearningFeatureExtraction:
+  mae3d_lung_CT:
+    root: ../../configs/dl_feature_extraction/mae3d_lung_CT

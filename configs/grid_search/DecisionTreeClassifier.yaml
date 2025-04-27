@@ -1,0 +1,8 @@
+criterion: ["gini", "entropy", "log_loss"]
+splitter: ["best", "random"]
+max_depth: [2, 3, 4, 5, 6]
+min_samples_split: [2, 5, 10]
+min_samples_leaf: [1, 2, 4]
+max_features: ["sqrt", "log2"]
+random_state: [42]
+class_weight: ['balanced']

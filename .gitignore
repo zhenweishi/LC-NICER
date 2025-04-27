@@ -1,0 +1,12 @@
+__pycache__
+output/
+.ipynb_checkpoints
+archive/
+examples/train/data/train
+examples/train/data/val
+examples/train/data/__AUTO__
+examples/train/pkl
+pyarmor_runtime_007377/.fuse_hidden001f010600000021
+.git_old
+*.pth.tar
+*.nii.gz

@@ -1,0 +1,340 @@
+Task_Name: LC-NICER_train
+
+Datasets_pre_Rad:
+  train:
+    type: training
+    path: output/LC-NICER_train/feature_merge/pre/Rad/train.csv
+  val:
+    type: validation
+    path: output/LC-NICER_train/feature_merge/pre/Rad/val.csv
+
+Datasets_pre_DL:
+  train:
+    type: training
+    path: output/LC-NICER_train/feature_merge/pre/DL/train.csv
+  val:
+    type: validation
+    path: output/LC-NICER_train/feature_merge/pre/DL/val.csv
+
+Datasets_pre_HI:
+  train:
+    type: training
+    path: output/LC-NICER_train/feature_merge/pre/HI/train.csv
+  val:
+    type: validation
+    path: output/LC-NICER_train/feature_merge/pre/HI/val.csv
+
+Datasets_post_Rad:
+  train:
+    type: training
+    path: output/LC-NICER_train/feature_merge/post/Rad/train.csv
+  val:
+    type: validation
+    path: output/LC-NICER_train/feature_merge/post/Rad/val.csv
+
+Datasets_post_DL:
+  train:
+    type: training
+    path: output/LC-NICER_train/feature_merge/post/DL/train.csv
+  val:
+    type: validation
+    path: output/LC-NICER_train/feature_merge/post/DL/val.csv
+
+Datasets_post_HI:
+  train:
+    type: training
+    path: output/LC-NICER_train/feature_merge/post/HI/train.csv
+  val:
+    type: validation
+    path: output/LC-NICER_train/feature_merge/post/HI/val.csv
+
+Datasets_delta_Rad:
+  train:
+    type: training
+    path: output/LC-NICER_train/feature_merge/delta/Rad/train.csv
+  val:
+    type: validation
+    path: output/LC-NICER_train/feature_merge/delta/Rad/val.csv
+
+Datasets_delta_DL:
+  train:
+    type: training
+    path: output/LC-NICER_train/feature_merge/delta/DL/train.csv
+  val:
+    type: validation
+    path: output/LC-NICER_train/feature_merge/delta/DL/val.csv
+
+Datasets_delta_HI:
+  train:
+    type: training
+    path: output/LC-NICER_train/feature_merge/delta/HI/train.csv
+  val:
+    type: validation
+    path: output/LC-NICER_train/feature_merge/delta/HI/val.csv
+
+Compose_GS1:
+  - Normalization: StandardScaler
+  - GridSearch: 
+      LogisticRegression:
+        model_name: LogisticRegression
+        params: ../../configs/grid_search/LogisticRegression.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+      GaussianNB:
+        model_name: GaussianNB
+        params: ../../configs/grid_search/GaussianNB.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+      DecisionTreeClassifier:
+        model_name: DecisionTreeClassifier
+        params: ../../configs/grid_search/DecisionTreeClassifier.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+      GradientBoostingClassifier:
+        model_name: GradientBoostingClassifier
+        params: ../../configs/grid_search/GradientBoostingClassifier.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+      KNeighborsClassifier:
+        model_name: KNeighborsClassifier
+        params: ../../configs/grid_search/KNeighborsClassifier.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+      RandomForestClassifier:
+        model_name: RandomForestClassifier
+        params: ../../configs/grid_search/RandomForestClassifier.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+      SVC:
+        model_name: SVC
+        params: ../../configs/grid_search/SVC.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+      XGBClassifier:
+        model_name: XGBClassifier
+        params: ../../configs/grid_search/XGBClassifier.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+  - Models: 
+      LogisticRegression:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+      GaussianNB:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+      DecisionTreeClassifier:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+      GradientBoostingClassifier:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+      KNeighborsClassifier:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+      RandomForestClassifier:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+      SVC:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+      XGBClassifier:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+  - ModelSelection: 
+      metric: AUC
+      weight:
+        train: 0
+        val: 1
+  - UseProbabilityAsFeature:
+      column_name: "{model}_Score" # {model} is the model name
+
+Compose_GS2:
+  - FeatureFusion:
+      method: concat
+      column_names: ["Rad_{old_name}", "DL_{old_name}", "HI_{old_name}"]
+  - Normalization: MinMaxScaler
+  - GridSearch: 
+      LogisticRegression:
+        model_name: LogisticRegression
+        params: ../../configs/grid_search/LogisticRegression.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+      GaussianNB:
+        model_name: GaussianNB
+        params: ../../configs/grid_search/GaussianNB.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+      DecisionTreeClassifier:
+        model_name: DecisionTreeClassifier
+        params: ../../configs/grid_search/DecisionTreeClassifier.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+      GradientBoostingClassifier:
+        model_name: GradientBoostingClassifier
+        params: ../../configs/grid_search/GradientBoostingClassifier.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+      KNeighborsClassifier:
+        model_name: KNeighborsClassifier
+        params: ../../configs/grid_search/KNeighborsClassifier.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+      RandomForestClassifier:
+        model_name: RandomForestClassifier
+        params: ../../configs/grid_search/RandomForestClassifier.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+      SVC:
+        model_name: SVC
+        params: ../../configs/grid_search/SVC.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+      XGBClassifier:
+        model_name: XGBClassifier
+        params: ../../configs/grid_search/XGBClassifier.yaml
+        max_workers: null
+        best_metric: AUC-Adaptive
+  - Models: 
+      LogisticRegression:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+      GaussianNB:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+      DecisionTreeClassifier:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+      GradientBoostingClassifier:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+      KNeighborsClassifier:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+      RandomForestClassifier:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+      SVC:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+      XGBClassifier:
+        class_name: null
+        params: null
+        pickle: null
+        fit: true
+  - ModelSelection: 
+      metric: AUC
+      weight:
+        train: 0
+        val: 1
+  - UseProbabilityAsFeature:
+      column_name: "{model}_Score" # {model} is the model name
+
+Workflow_pre_Rad:
+  PreviousWorkflow: null
+  Pipeline:
+  - Datasets: "@Datasets_pre_Rad"
+  - Compose: "@Compose_GS1"
+
+Workflow_pre_DL:
+  PreviousWorkflow: null
+  Pipeline:
+  - Datasets: "@Datasets_pre_DL"
+  - Compose: "@Compose_GS1"
+
+Workflow_pre_HI:
+  PreviousWorkflow: null
+  Pipeline:
+  - Datasets: "@Datasets_pre_HI"
+  - Compose: "@Compose_GS1"
+
+Workflow_post_Rad:
+  PreviousWorkflow: null
+  Pipeline:
+  - Datasets: "@Datasets_post_Rad"
+  - Compose: "@Compose_GS1"
+
+Workflow_post_DL:
+  PreviousWorkflow: null
+  Pipeline:
+  - Datasets: "@Datasets_post_DL"
+  - Compose: "@Compose_GS1"
+
+Workflow_post_HI:
+  PreviousWorkflow: null
+  Pipeline:
+  - Datasets: "@Datasets_post_HI"
+  - Compose: "@Compose_GS1"
+
+Workflow_delta_Rad:
+  PreviousWorkflow: null
+  Pipeline:
+  - Datasets: "@Datasets_delta_Rad"
+  - Compose: "@Compose_GS1"
+
+Workflow_delta_DL:
+  PreviousWorkflow: null
+  Pipeline:
+  - Datasets: "@Datasets_delta_DL"
+  - Compose: "@Compose_GS1"
+
+Workflow_delta_HI:
+  PreviousWorkflow: null
+  Pipeline:
+  - Datasets: "@Datasets_delta_HI"
+  - Compose: "@Compose_GS1"
+
+Workflow_pre:
+  PreviousWorkflow: ["Workflow_pre_Rad", "Workflow_pre_DL", "Workflow_pre_HI"]
+  Pipeline:
+  - Datasets: null
+  - Compose: "@Compose_GS2"
+
+Workflow_post:
+  PreviousWorkflow: ["Workflow_post_Rad", "Workflow_post_DL", "Workflow_post_HI"]
+  Pipeline:
+  - Datasets: null
+  - Compose: "@Compose_GS2"
+
+Workflow_delta:
+  PreviousWorkflow: ["Workflow_delta_Rad", "Workflow_delta_DL", "Workflow_delta_HI"]
+  Pipeline:
+  - Datasets: null
+  - Compose: "@Compose_GS2"
+
+Workflow_final:
+  PreviousWorkflow: ["Workflow_pre", "Workflow_post", "Workflow_delta"]
+  Pipeline:
+  - Datasets: null
+  - Compose: "@Compose_GS2"
+
+Main: "Workflow_final"
