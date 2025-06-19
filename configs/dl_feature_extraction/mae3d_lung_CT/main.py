@@ -10,6 +10,7 @@ from monai.transforms.transform import Transform, MapTransform, RandomizableTran
 import traceback
 
 from lib.models import vit_3d_base_patchsize8
+import time
 
 
 class PathJoin(Transform):
@@ -26,7 +27,7 @@ class PathJoin(Transform):
         data[self.path_key] = os.path.join(self.base_dir, data[self.name_key])
         return data
 
-def run(src_csv_path, base_dir, dst_csv_path):
+def load_model():
     model = vit_3d_base_patchsize8(img_size=48, in_chans=1, num_classes=2)
     checkpoint = torch.load("./lung_CT_checkpoint.pth.tar", map_location='cpu')
     if 'state_dict' in checkpoint:
@@ -77,18 +78,23 @@ def run(src_csv_path, base_dir, dst_csv_path):
 
     model = model.to(device)
     model.eval()
+    
+    return model, device
 
+def process_single_task(model, device, src_csv_path, base_dir, dst_csv_path):
     transform = monai.transforms.Compose([
         # 1. load the image file
         PathJoin(base_dir, "image_path", "#image#"),
         monai.transforms.LoadImaged(keys=["#image#"]),
         monai.transforms.EnsureChannelFirstd(keys=["#image#"], channel_dim="no_channel"),
-        monai.transforms.ScaleIntensityRangeD(keys=["#image#"], a_min=-1024, a_max=3072, b_min=0., b_max=1., clip=True), 
+        monai.transforms.ScaleIntensityRangeD(keys=["#image#"], a_min=-1024, a_max=3072, b_min=0., b_max=1., clip=True), # 威醒参考一篇肺的大模型的文章, 与预训练模型标准化一样
         monai.transforms.ToTensord(keys=["#image#"], track_meta=False),
         # 2. scale the image data
         # monai.transforms.ResizeWithPadOrCropd(keys=["#image#"], spatial_size=[48, 48, 48], mode="minimum"),
-        monai.transforms.Resized(keys=["#image#"], spatial_size=[48, 48, 48]), 
+        monai.transforms.Resized(keys=["#image#"], spatial_size=[48, 48, 48]), # 最好不要用这个, 不然传错了数据也不知道
     ])
+    
+    print(f"Processing: {src_csv_path} -> {dst_csv_path}")
     ds = monai.data.CSVDataset(src=src_csv_path, transform=transform)
     feat_df = []
     err_df = []
@@ -122,13 +128,32 @@ def run(src_csv_path, base_dir, dst_csv_path):
     Path(dst_csv_path).parent.mkdir(parents=True, exist_ok=True)
     new_df.to_csv(dst_csv_path, index=False)
 
+def run(src_csv_paths, base_dirs, dst_csv_paths):
+    # 只加载一次模型
+    start_time = time.time()
+    model, device = load_model()
+    end_time = time.time()
+    print(f"Model loading time: {end_time - start_time} seconds")
+    
+    start_time = time.time()
+    # 处理每个任务
+    for src_csv_path, base_dir, dst_csv_path in zip(src_csv_paths, base_dirs, dst_csv_paths):
+        process_single_task(model, device, src_csv_path, base_dir, dst_csv_path)
+    end_time = time.time()
+    print(f"Total processing time: {end_time - start_time} seconds")
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--src_csv_path", type=str, required=True)
-    parser.add_argument("--base_dir", type=str, required=True)
-    parser.add_argument("--dst_csv_path", type=str, required=True)
+    parser.add_argument("--src_csv_path", type=str, nargs='+', required=True, help="源CSV路径，可传入多个")
+    parser.add_argument("--base_dir", type=str, nargs='+', required=True, help="基础目录，可传入多个")
+    parser.add_argument("--dst_csv_path", type=str, nargs='+', required=True, help="目标CSV路径，可传入多个")
 
     args = parser.parse_args()
+    
+    # 确保三个参数列表的长度相同
+    if len(args.src_csv_path) != len(args.base_dir) or len(args.src_csv_path) != len(args.dst_csv_path):
+        print("错误：src_csv_path、base_dir和dst_csv_path的数量必须相同")
+        exit(1)
+        
     run(args.src_csv_path, args.base_dir, args.dst_csv_path)

@@ -2,7 +2,7 @@
 torch==2.1.0
 torchvision==0.16.0
 torchaudio==2.1.0
---index-url https://mirrors.bfsu.edu.cn/pypi/web/simple
+--index-url https://mirrors.ustc.edu.cn/pypi/simple
 SimpleITK==2.3.0
 wandb==0.15.12
 tensorboard==2.15.0
@@ -25,3 +25,6 @@ lifelines==0.27.8
 mrmr-selection==0.2.8
 pingouin==0.5.4
 xgboost==2.0.3
+PySide6==6.9.1
+PySide6_Addons==6.9.1
+PySide6_Essentials==6.9.1

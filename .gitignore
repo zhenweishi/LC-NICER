@@ -10,3 +10,9 @@ pyarmor_runtime_007377/.fuse_hidden001f010600000021
 .git_old
 *.pth.tar
 *.nii.gz
+medi_ai_bak/
+cache/
+medi_ai/.gitignore
+medi_ai/README.md
+medi_ai/.git
+pyarmor/

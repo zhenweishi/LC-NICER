@@ -75,6 +75,15 @@ cd LC-NICER
 pip install -r requirements.txt
 ```
 
+✔ **GUI Application Usage**  
+Launch the LC-NICER graphical user interface:
+```bash
+conda activate LCNICER
+cd LC-NICER/app
+python main.py
+```
+![GUI Interface](./assets/5.png)
+
 ✔ **Detailed Usage**  
 Check out our [Workflow Notebook](./examples/test/workflow.ipynb)
 ![arch](./assets/4.png)
